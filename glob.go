@@ -9,7 +9,7 @@ import (
 
 	"modernc.org/libc"
 
-	"github.com/xiezhenye/go-pcre/lib"
+	"github.com/xiezhenye/go-pcre/internal/lib"
 )
 
 // ConvertGlob converts the given glob into a

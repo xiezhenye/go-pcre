@@ -16,7 +16,7 @@ import (
 
 	"modernc.org/libc"
 
-	"github.com/xiezhenye/go-pcre/lib"
+	"github.com/xiezhenye/go-pcre/internal/lib"
 )
 
 // Version returns the version of pcre2 embedded in this library.

@@ -7,7 +7,7 @@ import (
 	"modernc.org/libc"
 	"modernc.org/libc/sys/types"
 
-	"github.com/xiezhenye/go-pcre/lib"
+	"github.com/xiezhenye/go-pcre/internal/lib"
 )
 
 var pce pcreError
