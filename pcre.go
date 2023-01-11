@@ -204,7 +204,12 @@ func (r *Regexp) FindSubmatch(b []byte) [][]byte {
 
 	out := make([][]byte, 0, len(match)/2)
 	for i := 0; i < len(match); i += 2 {
-		out = append(out, b[match[i]:match[i+1]])
+		begin := match[i]
+		if int64(begin) == -1 {
+			out = append(out, nil)
+		} else {
+			out = append(out, b[begin:match[i+1]])
+		}
 	}
 	return out
 }

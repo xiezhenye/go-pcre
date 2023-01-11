@@ -241,3 +241,11 @@ func TestSubexpNames(t *testing.T) {
 		t.Errorf("subexp names wrong: %#v", names)
 	}
 }
+
+func TestFindSubmatch(t *testing.T) {
+	r := MustCompile("(a+)?(b+)?(c+)?")
+	submatch := r.FindStringSubmatch("aaaccc")
+	if !reflect.DeepEqual([]string{"aaaccc", "aaa", "", "ccc"}, submatch) {
+		t.Errorf("submatch wrong %#v", submatch)
+	}
+}
