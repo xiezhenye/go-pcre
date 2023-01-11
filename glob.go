@@ -7,8 +7,9 @@ import (
 	"strings"
 	"unsafe"
 
-	"go.arsenm.dev/pcre/lib"
 	"modernc.org/libc"
+
+	"github.com/xiezhenye/go-pcre/lib"
 )
 
 // ConvertGlob converts the given glob into a
@@ -108,7 +109,7 @@ func Glob(glob string) ([]string, error) {
 
 	// Join splitDir and add filepath separator. This is the directory that will be searched.
 	dir := filepath.Join(splitDir...)
-	
+
 	if filepath.IsAbs(glob) {
 		dir = string(filepath.Separator) + dir
 	}

@@ -1,4 +1,4 @@
-module go.arsenm.dev/pcre
+module github.com/xiezhenye/go-pcre
 
 go 1.18
 

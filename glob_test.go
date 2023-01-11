@@ -1,14 +1,12 @@
-package pcre_test
+package pcre
 
 import (
 	"os"
 	"testing"
-
-	"go.arsenm.dev/pcre"
 )
 
 func TestCompileGlob(t *testing.T) {
-	r, err := pcre.CompileGlob("/**/bin")
+	r, err := CompileGlob("/**/bin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +56,7 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	err = touch("pcretest/file2")
 	if err != nil {
 		t.Fatal(err)
@@ -69,7 +67,7 @@ func TestGlob(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	matches, err := pcre.Glob("pcretest")
+	matches, err := Glob("pcretest")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +75,7 @@ func TestGlob(t *testing.T) {
 		t.Errorf("expected [pcretest], got %v", matches)
 	}
 
-	matches, err = pcre.Glob("pcretest/dir*")
+	matches, err = Glob("pcretest/dir*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +85,7 @@ func TestGlob(t *testing.T) {
 		t.Errorf("expected [pcretest/dir1 pcretest/dir2], got %v", matches)
 	}
 
-	matches, err = pcre.Glob("pcretest/file*")
+	matches, err = Glob("pcretest/file*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +95,7 @@ func TestGlob(t *testing.T) {
 		t.Errorf("expected [pcretest/file1 pcretest/file2], got %v", matches)
 	}
 
-	matches, err = pcre.Glob("pcretest/**/*.txt")
+	matches, err = Glob("pcretest/**/*.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

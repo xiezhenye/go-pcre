@@ -14,9 +14,9 @@ import (
 	"sync"
 	"unsafe"
 
-	"go.arsenm.dev/pcre/lib"
-
 	"modernc.org/libc"
+
+	"github.com/xiezhenye/go-pcre/lib"
 )
 
 // Version returns the version of pcre2 embedded in this library.
@@ -36,7 +36,7 @@ type Regexp struct {
 // Close() should be called on the returned expression
 // once it is no longer needed.
 func Compile(pattern string) (*Regexp, error) {
-	return CompileOpts(pattern, 0)
+	return CompileOpts(pattern, DupNames)
 }
 
 // CompileOpts compiles the provided pattern using the given options.

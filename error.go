@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"unsafe"
 
-	"go.arsenm.dev/pcre/lib"
-
 	"modernc.org/libc"
 	"modernc.org/libc/sys/types"
+
+	"github.com/xiezhenye/go-pcre/lib"
 )
 
 var pce pcreError
