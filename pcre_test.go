@@ -1,16 +1,14 @@
-package pcre_test
+package pcre
 
 import (
 	"reflect"
 	"strings"
 	"sync"
 	"testing"
-
-	"go.arsenm.dev/pcre"
 )
 
 func TestCompileError(t *testing.T) {
-	r, err := pcre.Compile("(")
+	r, err := Compile("(")
 	if err == nil {
 		t.Error("expected error, got nil")
 	}
@@ -18,7 +16,7 @@ func TestCompileError(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	r := pcre.MustCompile(`\d+ (?=USD)`)
+	r := MustCompile(`\d+ (?=USD)`)
 	defer r.Close()
 
 	matches := r.MatchString("9000 USD")
@@ -48,7 +46,7 @@ func TestMatch(t *testing.T) {
 }
 
 func TestMatchUngreedy(t *testing.T) {
-	r := pcre.MustCompileOpts(`Hello, (.+)\.`, pcre.Ungreedy)
+	r := MustCompileOpts(`Hello, (.+)\.`, Ungreedy)
 	defer r.Close()
 
 	submatches := r.FindAllStringSubmatch("Hello, World. Hello, pcre2.", 1)
@@ -63,7 +61,7 @@ func TestMatchUngreedy(t *testing.T) {
 }
 
 func TestReplace(t *testing.T) {
-	r := pcre.MustCompile(`(\d+)\.\d+`)
+	r := MustCompile(`(\d+)\.\d+`)
 	defer r.Close()
 
 	testStr := "123.54321 Test"
@@ -97,7 +95,7 @@ func TestReplace(t *testing.T) {
 }
 
 func TestSplit(t *testing.T) {
-	r := pcre.MustCompile("a*")
+	r := MustCompile("a*")
 	defer r.Close()
 
 	split := r.Split("abaabaccadaaae", 5)
@@ -119,7 +117,7 @@ func TestSplit(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	r := pcre.MustCompile(`(\d+)`)
+	r := MustCompile(`(\d+)`)
 	defer r.Close()
 
 	testStr := "3 times 4 is 12"
@@ -167,7 +165,7 @@ func TestFind(t *testing.T) {
 }
 
 func TestSubexpIndex(t *testing.T) {
-	r := pcre.MustCompile(`(?P<number>\d)`)
+	r := MustCompile(`(?P<number>\d)`)
 	defer r.Close()
 
 	index := r.SubexpIndex("number")
@@ -187,7 +185,7 @@ func TestSubexpIndex(t *testing.T) {
 }
 
 func TestConcurrency(t *testing.T) {
-	r := pcre.MustCompile(`\d*`)
+	r := MustCompile(`\d*`)
 	defer r.Close()
 
 	wg := &sync.WaitGroup{}
@@ -228,7 +226,7 @@ func TestConcurrency(t *testing.T) {
 func TestString(t *testing.T) {
 	const expr = `()`
 
-	r := pcre.MustCompile(expr)
+	r := MustCompile(expr)
 	defer r.Close()
 
 	if r.String() != expr {
@@ -237,9 +235,9 @@ func TestString(t *testing.T) {
 }
 
 func TestSubexpNames(t *testing.T) {
-	r := pcre.MustCompile("(?P<aaa>.+) (a) (?P<bbbb>.+)")
+	r := MustCompileOpts("(?P<foo>.+) (a) (?P<bar>.+)(?P<bar>.+)", DupNames)
 	names := r.SubexpNames()
-	if !reflect.DeepEqual([]string{"", "aaa", "", "bbbb"}, names) {
+	if !reflect.DeepEqual([]string{"", "foo", "", "bar", "bar"}, names) {
 		t.Errorf("subexp names wrong: %#v", names)
 	}
 }
