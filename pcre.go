@@ -24,10 +24,11 @@ func Version() string { return lib.DPACKAGE_VERSION }
 
 // Regexp represents a pcre2 regular expression
 type Regexp struct {
-	mtx  *sync.Mutex
-	expr string
-	re   uintptr
-	tls  *libc.TLS
+	mtx   *sync.Mutex
+	expr  string
+	re    uintptr
+	tls   *libc.TLS
+	names []string
 }
 
 // Compile runs CompileOpts with no options.
@@ -78,6 +79,7 @@ func CompileOpts(pattern string, options CompileOption) (*Regexp, error) {
 		re:   r,
 		tls:  tls,
 	}
+	regex.names = regex.subexpNames()
 
 	// Make sure resources are freed if GC collects the
 	// regular expression.
@@ -298,7 +300,7 @@ func (r *Regexp) FindStringIndex(s string) []int {
 // FinAllString is the String version of FindAll
 func (r *Regexp) FindAllString(s string, n int) []string {
 	matches := r.FindAll([]byte(s), n)
-	
+
 	out := make([]string, len(matches))
 	for index, match := range matches {
 		out[index] = string(match)
@@ -528,6 +530,40 @@ func (r *Regexp) String() string {
 	return r.expr
 }
 
+func (r *Regexp) subexpNames() []string {
+	nameCount := int(r.patternInfo(lib.DPCRE2_INFO_NAMECOUNT))
+	numSubexp := r.NumSubexp()
+	entrySize := int(r.patternInfo(lib.DPCRE2_INFO_NAMEENTRYSIZE))
+	pEntry := uintptr(0)
+	ppEntry := uintptr(unsafe.Pointer(&pEntry))
+	lib.Xpcre2_pattern_info_8(r.tls, r.re, lib.DPCRE2_INFO_NAMETABLE, ppEntry)
+	ret := make([]string, numSubexp+1)
+	for i := 0; i < nameCount; i++ {
+		indexLe := *(*int16)(unsafe.Pointer(pEntry))
+		index := indexLe>>8 + (indexLe&0xff)<<8
+		nameBytes := make([]byte, entrySize-2)
+		p := pEntry + uintptr(2)
+		si := 0
+		for {
+			c := *(*byte)(unsafe.Pointer(p))
+			if c == 0 {
+				break
+			}
+			nameBytes[si] = c
+			p += 1
+			si += 1
+		}
+		name := string(nameBytes[0:si])
+		pEntry += uintptr(entrySize)
+		ret[index] = name
+	}
+	return ret
+}
+
+func (r *Regexp) SubexpNames() []string {
+	return r.names
+}
+
 // SubexpIndex returns the index of the subexpression
 // with the given name, or -1 if there is no subexpression
 // with that name.
@@ -540,6 +576,7 @@ func (r *Regexp) SubexpIndex(name string) int {
 	if err != nil {
 		panic(err)
 	}
+	defer libc.Xfree(r.tls, cName)
 
 	// Get substring index from name
 	ret := lib.Xpcre2_substring_number_from_name_8(r.tls, r.re, cName)
@@ -577,7 +614,7 @@ func (r *Regexp) match(b []byte, options uint32, multi bool) ([][]lib.Tsize_t, e
 	if len(b) == 0 {
 		return nil, nil
 	}
-	
+
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 

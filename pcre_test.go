@@ -1,6 +1,7 @@
 package pcre_test
 
 import (
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -232,5 +233,13 @@ func TestString(t *testing.T) {
 
 	if r.String() != expr {
 		t.Errorf("expected %s, got %s", expr, r.String())
+	}
+}
+
+func TestSubexpNames(t *testing.T) {
+	r := pcre.MustCompile("(?P<aaa>.+) (a) (?P<bbbb>.+)")
+	names := r.SubexpNames()
+	if !reflect.DeepEqual([]string{"", "aaa", "", "bbbb"}, names) {
+		t.Errorf("subexp names wrong: %#v", names)
 	}
 }
